@@ -1,0 +1,29 @@
+{
+  "name": "capstone-backend",
+  "version": "1.0.0",
+  "description": "capstone project backend application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mark David Panganiban",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "moment-timezone": "^0.5.43",
+    "mongodb": "^6.2.0",
+    "mongoose": "^8.0.0",
+    "morgan": "^1.10.0",
+    "ntp-client": "^0.5.3"
+  },
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
