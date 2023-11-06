@@ -25,5 +25,8 @@
   "type": "module",
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14<15"
   }
 }
