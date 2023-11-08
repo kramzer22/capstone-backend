@@ -1,16 +1,11 @@
 import express from "express";
-import User from "../models/User.js";
 
 import clientController from "../controllers/clientController.js";
 
 const clientRouter = express.Router();
 
-clientRouter.get("/", clientController.getAllClient);
+clientRouter.get("/");
 
-clientRouter.post(
-  "/",
-  clientController.validateClientData,
-  clientController.createUserClient
-);
+clientRouter.post("/register-client", clientController.createUserClient);
 
 export default clientRouter;

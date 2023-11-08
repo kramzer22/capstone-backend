@@ -1,10 +1,31 @@
 import mongoose from "mongoose";
 
 const clientSchema = new mongoose.Schema({
-  email: String,
-  first_name: String,
-  last_name: String,
-  number: String,
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    minlength: 5,
+    maxlength: 100,
+  },
+  first_name: {
+    type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 100,
+  },
+  last_name: {
+    type: String,
+    required: true,
+    minlength: 1,
+    maxlength: 100,
+  },
+  number: {
+    type: String,
+    required: true,
+    minlength: 11,
+    maxlength: 11,
+  },
 });
 
 clientSchema.set("toJSON", {

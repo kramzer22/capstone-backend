@@ -1,14 +1,8 @@
 import mongoose from "mongoose";
 
 const tokenSchema = new mongoose.Schema({
-  user_aceess: {
-    type: Boolean,
-    default: false,
-  },
-  user_create: {
-    type: Boolean,
-    default: false,
-  },
+  token: String,
+  iv: String,
   key_status: {
     type: String,
     default: "available",
@@ -25,6 +19,6 @@ tokenSchema.set("toJSON", {
   },
 });
 
-const Token = mongoose.model("token", tokenSchema);
+const RegistrationToken = mongoose.model("registration_token", tokenSchema);
 
-export default Token;
+export default RegistrationToken;
