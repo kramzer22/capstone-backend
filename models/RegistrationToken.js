@@ -7,6 +7,7 @@ const tokenSchema = new mongoose.Schema({
     type: String,
     default: "available",
   },
+  transaction_type: String,
   entry_date: Date,
   expiry_date: Date,
 });
@@ -19,6 +20,6 @@ tokenSchema.set("toJSON", {
   },
 });
 
-const RegistrationToken = mongoose.model("registration_token", tokenSchema);
+const RegistrationToken = mongoose.model("transaction_token", tokenSchema);
 
 export default RegistrationToken;

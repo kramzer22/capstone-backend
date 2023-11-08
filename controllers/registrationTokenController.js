@@ -1,11 +1,11 @@
 import RegistrationToken from "../models/RegistrationToken.js";
 import moduleHelper from "../util/moduleHelpers.js";
 
-const createRegistrationToken = (request, response) => {
+const createTransactionToken = (request, response, d, n, type) => {
   const token = moduleHelper.encryptData(request.body);
 
   moduleHelper
-    .getToday(1, "hour")
+    .getToday(n, d)
     .then((dates) => {
       const entryDate = dates.entry_date;
       const expiryDate = dates.expiry_date;
@@ -13,6 +13,7 @@ const createRegistrationToken = (request, response) => {
       const registrationToken = new RegistrationToken({
         token: token.token,
         iv: token.iv,
+        transaction_type: type,
         entry_date: entryDate,
         expiry_date: expiryDate,
       });
@@ -40,4 +41,4 @@ const createRegistrationToken = (request, response) => {
     });
 };
 
-export default { createRegistrationToken };
+export default { createTransactionToken };

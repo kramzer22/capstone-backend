@@ -1,4 +1,3 @@
-import User from "../models/User.js";
 import Client from "../models/Client.js";
 import RegistrationToken from "../models/RegistrationToken.js";
 
@@ -8,14 +7,18 @@ import moduleHelpers from "../util/moduleHelpers.js";
 function createUserClient(request, response) {
   const tokenID = request.query.token_id;
 
-  RegistrationToken.findOne({ token: tokenID, key_status: "available" })
+  RegistrationToken.findOne({
+    token: tokenID,
+    key_status: "available",
+    transaction_type: "client-registration",
+  })
     .then((result) => {
       if (!result) {
         response.status(403).json({ message: "invalid token" });
       }
 
       const data = moduleHelpers.decryptData(result.token, result.iv);
-      console.log(data);
+
       clientHelpers
         .runCreateClientTransaction(data, result._id)
         .then((newUser) => {
