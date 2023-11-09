@@ -6,6 +6,8 @@ import Client from "../models/Client.js";
 import User from "../models/User.js";
 import RegistrationToken from "../models/RegistrationToken.js";
 
+import moduleHelper from "../util/moduleHelpers.js";
+
 // This code validates the information entered before proceeding
 
 const validationRulesForClientData = [

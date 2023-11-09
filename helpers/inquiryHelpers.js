@@ -4,6 +4,8 @@ import { body, validationResult } from "express-validator";
 import RegistrationToken from "../models/RegistrationToken.js";
 import Inquiry from "../models/Inquiry.js";
 
+import moduleHelper from "../util/moduleHelpers.js";
+
 const validationRulesForInquiryData = [
   body("email").isEmail().withMessage("Invalid email format"),
   body("first_name").custom((value) => {
@@ -89,12 +91,16 @@ const runCreateInquiryTransaction = async (requestBody, tokenID) => {
   try {
     const data = JSON.parse(requestBody);
 
+    const dates = await moduleHelper.getToday(1, "hour");
+    const entryDate = dates.entry_date;
+
     const inquiry = new Inquiry({
       email: data.email.toLowerCase(),
       first_name: data.first_name.toLowerCase(),
       last_name: data.last_name.toLowerCase(),
       number: data.number,
       note: data.note,
+      entry_date: entryDate,
     });
 
     const session = await mongoose.startSession();
@@ -119,6 +125,12 @@ const runCreateInquiryTransaction = async (requestBody, tokenID) => {
       return error;
     }
   } catch (error) {
+    try {
+      await RegistrationToken.findOneAndDelete({ _id: tokenID });
+    } catch {
+      console.error("Error deleting token:", deleteError);
+    }
+
     return error;
   }
 };

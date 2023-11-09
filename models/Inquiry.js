@@ -30,6 +30,12 @@ const inquirySchema = new mongoose.Schema({
     required: true,
     minlength: 11,
   },
+  status: {
+    type: String,
+    default: "pending",
+    enum: ["pending", "ongoing", "completed"],
+  },
+  entry_date: Date,
 });
 
 inquirySchema.set("toJSON", {
