@@ -26,7 +26,7 @@ registrationRouter.post(
   inquiryHelpers.validationRulesForInquiryData,
   inquiryHelpers.handleErrorsForInquiryData,
   (request, response) => {
-    RegistrationTokenController.createTransactionToken(
+    registrationTokenController.createTransactionToken(
       request,
       response,
       "hour",
