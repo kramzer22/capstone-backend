@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 import clientRouter from "./routes/clientRouter.js";
-import registrationRouter from "./routes/RegistrationRouter.js";
+import registrationRouter from "./routes/registrationRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
 
 dotenv.config();
@@ -26,8 +26,8 @@ mongoose.connect(url);
 
 const PORT = 3001;
 
-app.use("/api/client", clientRouter);
 app.use("/api/token", registrationRouter);
+app.use("/api/client", clientRouter);
 app.use("/api/inquiry", inquiryRouter);
 
 app.listen(PORT, () => {
