@@ -3,8 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import clientRouter from "./routes/clientRouter.js";
 import registrationRouter from "./routes/registrationRouter.js";
+import clientRouter from "./routes/clientRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
 
 dotenv.config();

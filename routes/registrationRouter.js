@@ -1,6 +1,6 @@
 import express from "express";
 
-import RegistrationTokenController from "../controllers/RegistrationTokenController.js";
+import registrationTokenController from "../controllers/registrationTokenController.js";
 import clientHelpers from "../helpers/clientHelpers.js";
 import inquiryHelpers from "../helpers/inquiryHelpers.js";
 
@@ -11,7 +11,7 @@ registrationRouter.post(
   clientHelpers.validationRulesForClientData,
   clientHelpers.handleErrorsForClientData,
   (request, response) => {
-    RegistrationTokenController.createTransactionToken(
+    registrationTokenController.createTransactionToken(
       request,
       response,
       "hour",
