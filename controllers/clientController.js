@@ -1,89 +1,45 @@
 import Client from "../models/Client.js";
-import RegistrationToken from "../models/RegistrationToken.js";
 
 import clientHelpers from "../helpers/clientHelpers.js";
+
 import moduleHelpers from "../util/moduleHelpers.js";
 
-function createUserClient(request, response) {
-  const tokenID = request.query.token_id;
+const createUserClient = async (request, response) => {
+  try {
+    const tokenID = request.query.token_id;
 
-  RegistrationToken.findOne({
-    token: tokenID,
-    key_status: "available",
-    transaction_type: "client-registration",
-  })
-    .then((result) => {
-      if (!result) {
-        response.status(403).json({ message: "invalid token" });
-      }
+    const tokenResult = await moduleHelpers.checkTokenValidity(
+      tokenID,
+      "client-registration"
+    );
 
-      const data = moduleHelpers.decryptData(result.token, result.iv);
+    const data = moduleHelpers.decryptData(tokenResult.token, tokenResult.iv);
 
-      clientHelpers
-        .runCreateClientTransaction(data, result._id)
-        .then((newUser) => {
-          console.log("New user registered", newUser);
-          response.status(201).json({
-            message: "successfully registered client",
-            emai: newUser.email,
-          });
-        })
-        .catch((error) => {
-          response
-            .status(400)
-            .json({ message: "failed to register client", error });
-        });
-    })
-    .catch((error) => {
-      response.status(403).json({ message: "invalid token", error });
+    const newClient = await clientHelpers.runCreateClientTransaction(
+      data,
+      tokenResult._id
+    );
+
+    console.log(
+      `New user registered\nemail:${newClient.email}\nname:${newClient.first_name} ${newClient.last_name}`
+    );
+
+    response.status(201).json({
+      message: "successfully registered client",
+      emai: newClient.email,
     });
-  // Token.findById(keyID)
-  //   .then((key) => {
-  //     if (key && key.user_create === true && key.key_status === "available") {
-  //       const validationErrors = validationResult(request);
-
-  //       if (!validationErrors.isEmpty()) {
-  //         return response
-  //           .status(400)
-  //           .json({ errors: validationErrors.array() });
-  //       }
-
-  //       const requestBody = request.body;
-  //       User.find({ email: requestBody.email })
-  //         .then((users) => {
-  //           if (users.length === 0) {
-  //             clientHelpers
-  //               .runCreateClientTransaction(requestBody, key._id)
-  //               .then((newUser) => {
-  //                 console.log(newUser);
-  //                 response.status(201).json({
-  //                   message: "Client successfully added",
-  //                   email: newUser.email,
-  //                 });
-  //               })
-  //               .catch((error) => {
-  //                 response
-  //                   .status(400)
-  //                   .json({ message: "Failed to process transaction", error });
-  //               });
-  //           } else {
-  //             response.status(400).json({ message: "Already a member" });
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           response
-  //             .status(500)
-  //             .json({ message: "Failed to find user", error });
-  //         });
-  //     } else {
-  //       response.status(401).json({ message: "invalid API key" });
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     response.status(401).json({ message: "transaction forbidden", error });
-  //   });
-}
+  } catch (error) {
+    if (error.message === "invalidTokenError") {
+      console.log("missing or invalid token");
+      response.status(401).json({ message: "Unauthorized access." });
+    } else {
+      console.log("Unable to process transaction", error);
+      response
+        .status(500)
+        .json({ message: "Failed to process client registration. Try again." });
+    }
+  }
+};
 
 // Find all user
 function getAllClient(request, response) {

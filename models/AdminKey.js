@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const clientSchema = new mongoose.Schema({
+const adminKeySchema = new mongoose.Schema({
   inquiry_access: {
     type: Boolean,
     default: false,
@@ -13,6 +13,22 @@ const clientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  key_status: {
+    type: String,
+    default: "available",
+  },
   entry_date: Date,
   expiry_date: Date,
 });
+
+adminKeySchema.set("toJSON", {
+  transform: (_document, returnedObject) => {
+    returnedObject.id = returnedObject._id;
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const RegistrationToken = mongoose.model("admin_token", adminKeySchema);
+
+export default RegistrationToken;

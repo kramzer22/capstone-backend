@@ -1,6 +1,9 @@
 import fetch from "node-fetch";
 import moment from "moment-timezone";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
+
+import RegistrationToken from "../models/RegistrationToken.js";
 
 const getToday = async (n, d) => {
   try {
@@ -9,7 +12,7 @@ const getToday = async (n, d) => {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch data");
+      throw new Error("dateFetchError");
     }
 
     const data = await response.json();
@@ -18,8 +21,7 @@ const getToday = async (n, d) => {
 
     return { entry_date: entryDate, expiry_date: expiryDate };
   } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    throw new Error("dateFetchError");
   }
 };
 
@@ -55,4 +57,37 @@ const decryptData = (encryptData, iv) => {
   return decryptJSON;
 };
 
-export default { getToday, encryptData, decryptData };
+const hashData = async (data) => {
+  const saltRounds = 10;
+  try {
+    return await bcrypt.hash(data, saltRounds);
+  } catch (error) {
+    throw new Error("bcryptHashError");
+  }
+};
+
+const checkTokenValidity = async (tokenID, transactionType) => {
+  try {
+    const tokenResult = await RegistrationToken.findOne({
+      token: tokenID,
+      key_status: "available",
+      transaction_type: transactionType,
+    });
+
+    if (!tokenResult) {
+      throw new Error("invalidTokenError");
+    }
+
+    return tokenResult;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export default {
+  getToday,
+  encryptData,
+  decryptData,
+  hashData,
+  checkTokenValidity,
+};

@@ -6,7 +6,7 @@ import Client from "../models/Client.js";
 import User from "../models/User.js";
 import RegistrationToken from "../models/RegistrationToken.js";
 
-import moduleHelper from "../util/moduleHelpers.js";
+import moduleHelpers from "../util/moduleHelpers.js";
 
 // This code validates the information entered before proceeding
 
@@ -71,15 +71,14 @@ const handleErrorsForClientData = async (request, response, next) => {
   }
 
   try {
-    const isDuplicate = await checkEmailForDuplicate(request.body.email);
-    console.log(isDuplicate);
-    if (isDuplicate) {
+    if (await checkEmailForDuplicate(request.body.email)) {
       return response.status(403).json({ error: "email duplicate found" });
     }
+
     next();
   } catch (error) {
-    console.log(error);
-    return response.status(500).json({ error: "Internal server error" });
+    console.log("input data error");
+    return response.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -92,26 +91,10 @@ const checkEmailForDuplicate = async (email) => {
   }
 };
 
-// End of client data validation
-
-const hashPassword = (password) => {
-  const saltRounds = 10;
-  return new Promise((resolve, reject) => {
-    bcrypt.hash(password, saltRounds, (error, hash) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(hash);
-      }
-    });
-  });
-};
-
 const runCreateClientTransaction = async (requestBody, tokenID) => {
   try {
     const data = JSON.parse(requestBody);
-    const hash = await hashPassword(data.password);
-    console.log(data);
+    const hash = await moduleHelpers.hashData(data.password);
 
     const user = new User({
       email: data.email.toLowerCase(),
@@ -139,16 +122,31 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
       await session.commitTransaction();
       session.endSession();
 
-      return user;
+      return client;
     } catch (error) {
-      console.log(error);
+      console.error("client creation failed");
+
       await session.abortTransaction();
       session.endSession();
 
-      return error;
+      await RegistrationToken.findOneAndUpdate(
+        { _id: tokenID },
+        { key_status: "fail" },
+        { new: false }
+      );
+
+      throw error;
     }
   } catch (error) {
-    return error;
+    console.error("password hashing failed");
+
+    await RegistrationToken.findOneAndUpdate(
+      { _id: tokenID },
+      { key_status: "fail" },
+      { new: false }
+    );
+
+    throw error;
   }
 };
 
