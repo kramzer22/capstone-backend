@@ -2,23 +2,25 @@ import fetch from "node-fetch";
 import moment from "moment-timezone";
 import crypto from "crypto";
 
-const getToday = (n, d) => {
-  return fetch("http://worldtimeapi.org/api/timezone/America/New_York")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const entryDate = moment(data.datetime).tz("Asia/Singapore");
-      const expiryDate = entryDate.clone().add(n, d);
-      return { entry_date: entryDate, expiry_date: expiryDate };
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      throw error;
-    });
+const getToday = async (n, d) => {
+  try {
+    const response = await fetch(
+      "http://worldtimeapi.org/api/timezone/America/New_York"
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+    const entryDate = moment(data.datetime).tz("Asia/Singapore");
+    const expiryDate = entryDate.clone().add(n, d);
+
+    return { entry_date: entryDate, expiry_date: expiryDate };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
 };
 
 const encryptData = (data) => {
