@@ -22,7 +22,9 @@
     "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
     "node-fetch": "^3.3.2",
-    "ntp-client": "^0.5.3"
+    "nodemailer": "^6.9.7",
+    "ntp-client": "^0.5.3",
+    "validator": "^13.11.0"
   },
   "type": "module",
   "devDependencies": {

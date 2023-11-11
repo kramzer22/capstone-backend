@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import moment from "moment-timezone";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 import RegistrationToken from "../models/RegistrationToken.js";
 
@@ -84,10 +85,38 @@ const checkTokenValidity = async (tokenID, transactionType) => {
   }
 };
 
+const sendMailToUser = async (email, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.ENV_MAILER,
+        pass: process.env.ENV_MAILER_PASSWORD,
+      },
+    });
+
+    const mail = {
+      from: process.env.ENV_MAILER,
+      to: email,
+      subject: subject,
+      text: message,
+    };
+
+    const result = await transporter.sendMail(mail);
+    console.log(`email sent to: ${email}`);
+
+    return { success: true, message: "Email sent successfully", result };
+  } catch (error) {
+    console.log(`error sending email to ${email}`);
+    throw new Error("mailerError");
+  }
+};
+
 export default {
   getToday,
   encryptData,
   decryptData,
   hashData,
   checkTokenValidity,
+  sendMailToUser,
 };

@@ -5,7 +5,7 @@ import moduleHelpers from "../util/moduleHelpers.js";
 const createAdminToken = async (request, response) => {
   try {
     const secretKey = request.query.secret;
-    if (!secretKey && process.env.ENV_SECRET_KEY !== secretKey) {
+    if (!secretKey || process.env.ENV_SECRET_KEY !== secretKey) {
       throw new Error("invalidKeyError");
     }
     const dates = await moduleHelpers.getToday(3, "month");
@@ -38,4 +38,26 @@ const createAdminToken = async (request, response) => {
   }
 };
 
-export default { createAdminToken };
+const getAdminList = async (request, response) => {
+  try {
+    const key_id = request.query.key_id;
+    if (!key_id || !(await AdminKey.findOne({ api_key: key_id }))) {
+      throw new Error("invalidKeyError");
+    }
+    const adminKeyList = await AdminKey.find({});
+
+    response.status(200).json(adminKeyList);
+  } catch (error) {
+    if (error.message === "invalidKeyError") {
+      console.log("missing or invalid key");
+      response.status(401).json({ message: "Unauthorized access." });
+    } else {
+      console.log("Unable to process transaction");
+      response
+        .status(500)
+        .json({ message: "Failed to process transaction. Try again." });
+    }
+  }
+};
+
+export default { createAdminToken, getAdminList };

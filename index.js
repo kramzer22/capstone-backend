@@ -8,6 +8,7 @@ import registrationRouter from "./routes/registrationRouter.js";
 import clientRouter from "./routes/clientRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
 import adminRouter from "./routes/adminRouter.js";
+import hostRouter from "./routes/hostRouter.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ const PORT = 3001;
 
 app.use("/api/token", registrationRouter);
 app.use("/api/client", clientRouter);
+app.use("/api/host", hostRouter);
 app.use("/api/inquiry", inquiryRouter);
 app.use("/api/admin", adminRouter);
 

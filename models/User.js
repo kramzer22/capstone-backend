@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
+  entry_date: Date,
 });
 
 userSchema.set("toJSON", {

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
 
 import Client from "../models/Client.js";
@@ -95,11 +94,13 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
   try {
     const data = JSON.parse(requestBody);
     const hash = await moduleHelpers.hashData(data.password);
+    const dates = await moduleHelpers.getToday(30, "day");
 
     const user = new User({
       email: data.email.toLowerCase(),
       password: hash,
       role: "client",
+      entry_date: dates.entry_date,
     });
     const client = new Client({
       email: data.email.toLowerCase(),
@@ -108,11 +109,26 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
       number: data.number,
     });
 
+    const tokenResult = moduleHelpers.encryptData({
+      email: data.email.toLowerCase(),
+      entry_date: dates.entry_date,
+      expiry_date: dates.expiry_date,
+    });
+
+    const invitationToken = RegistrationToken({
+      token: tokenResult.token,
+      iv: tokenResult.iv,
+      transaction_type: "email-verify",
+      entry_date: dates.entry_date,
+      expiry_date: dates.expiry_date,
+    });
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       await user.save();
       await client.save();
+      await invitationToken.save();
       await RegistrationToken.findOneAndUpdate(
         { _id: tokenID },
         { key_status: "used" },
@@ -122,7 +138,18 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
       await session.commitTransaction();
       session.endSession();
 
-      return client;
+      try {
+        const message = `Please click the link provided below to verify your email.\n\nhttps://capstone-backend-4pv2.onrender.com/api/client/verify/?token=${tokenResult.token}`;
+        await moduleHelpers.sendMailToUser(
+          data.email.toLowerCase(),
+          "Booking app email verification",
+          message
+        );
+      } catch {
+        console.log("error sending mail");
+      } finally {
+        return client;
+      }
     } catch (error) {
       console.error("client creation failed");
 
