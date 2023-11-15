@@ -8,9 +8,9 @@ import transactionTokenController from "../controllers/transactionTokenControlle
 const hostRouter = express.Router();
 
 hostRouter.post(
-  "/register/",
+  "/register",
   (request, response, next) => {
-    const tokenType = "invite-host";
+    const tokenType = "host-invite";
     transactionTokenController.checkTransactionToken(
       request,
       response,
