@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import RegistrationToken from "../models/RegistrationToken.js";
+import TransactionToken from "../models/TransactionToken.js";
 import AdminKey from "../models/AdminKey.js";
 import Inquiry from "../models/Inquiry.js";
 

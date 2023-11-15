@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ["client", "host", "organizer"],
+    enum: ["client", "host"],
   },
   verified: {
     type: Boolean,

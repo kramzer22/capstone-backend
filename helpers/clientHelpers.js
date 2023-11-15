@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 
 import Client from "../models/Client.js";
 import User from "../models/User.js";
-import RegistrationToken from "../models/RegistrationToken.js";
+import TransactionToken from "../models/TransactionToken.js";
 
 import moduleHelpers from "../util/moduleHelpers.js";
 
@@ -81,56 +81,38 @@ const handleErrorsForClientData = async (request, response, next) => {
   }
 };
 
-const checkEmailForDuplicate = async (email) => {
+const registerClient = async (registrationToken) => {
   try {
-    const result = await User.findOne({ email: email });
-    return !!result; // Convert the result to a boolean (true if found, false if not found)
-  } catch (error) {
-    throw error;
-  }
-};
-
-const runCreateClientTransaction = async (requestBody, tokenID) => {
-  try {
-    const data = JSON.parse(requestBody);
-    const hash = await moduleHelpers.hashData(data.password);
-    const dates = await moduleHelpers.getToday(30, "day");
-
+    const data = JSON.parse(
+      moduleHelpers.decryptData(registrationToken.token, registrationToken.iv)
+    );
+    const registrationDate = (await moduleHelpers.getToday(1, "hour"))
+      .entry_date;
+    const encryptedPassword = await moduleHelpers.hashData(data.password);
     const user = new User({
-      email: data.email.toLowerCase(),
-      password: hash,
+      email: data.email,
+      password: encryptedPassword,
       role: "client",
-      entry_date: dates.entry_date,
+      entry_date: registrationDate,
     });
+
     const client = new Client({
-      email: data.email.toLowerCase(),
-      first_name: data.first_name.toLowerCase(),
-      last_name: data.last_name.toLowerCase(),
+      email: data.email,
+      name: {
+        first_name: data.name.first_name,
+        last_name: data.name.last_name,
+      },
       number: data.number,
-    });
-
-    const tokenResult = moduleHelpers.encryptData({
-      email: data.email.toLowerCase(),
-      entry_date: dates.entry_date,
-      expiry_date: dates.expiry_date,
-    });
-
-    const invitationToken = RegistrationToken({
-      token: tokenResult.token,
-      iv: tokenResult.iv,
-      transaction_type: "email-verify",
-      entry_date: dates.entry_date,
-      expiry_date: dates.expiry_date,
     });
 
     const session = await mongoose.startSession();
     session.startTransaction();
+
     try {
       await user.save();
       await client.save();
-      await invitationToken.save();
-      await RegistrationToken.findOneAndUpdate(
-        { _id: tokenID },
+      await TransactionToken.findOneAndUpdate(
+        { token: registrationToken.token },
         { key_status: "used" },
         { new: false }
       );
@@ -138,41 +120,28 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
       await session.commitTransaction();
       session.endSession();
 
+      console.log("client user registered successfully");
+
+      const emailData = {
+        email: data.email,
+        role: "client",
+        entry_date: registrationDate,
+      };
       try {
-        const message = `Please click the link provided below to verify your email.\n\nhttps://capstone-backend-4pv2.onrender.com/api/client/verify/?token=${tokenResult.token}`;
-        await moduleHelpers.sendMailToUser(
-          data.email.toLowerCase(),
-          "Booking app email verification",
-          message
-        );
-      } catch {
-        console.log("error sending mail");
+        await moduleHelpers.sendEmailVerification(emailData);
+      } catch (error) {
       } finally {
         return client;
       }
     } catch (error) {
-      console.error("client creation failed");
+      console.log("fail to save host data");
 
       await session.abortTransaction();
       session.endSession();
 
-      await RegistrationToken.findOneAndUpdate(
-        { _id: tokenID },
-        { key_status: "fail" },
-        { new: false }
-      );
-
       throw error;
     }
   } catch (error) {
-    console.error("password hashing failed");
-
-    await RegistrationToken.findOneAndUpdate(
-      { _id: tokenID },
-      { key_status: "fail" },
-      { new: false }
-    );
-
     throw error;
   }
 };
@@ -180,5 +149,5 @@ const runCreateClientTransaction = async (requestBody, tokenID) => {
 export default {
   validationRulesForClientData,
   handleErrorsForClientData,
-  runCreateClientTransaction,
+  registerClient,
 };

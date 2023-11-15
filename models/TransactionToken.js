@@ -20,6 +20,6 @@ tokenSchema.set("toJSON", {
   },
 });
 
-const RegistrationToken = mongoose.model("transaction_token", tokenSchema);
+const TransactionToken = mongoose.model("transaction_token", tokenSchema);
 
-export default RegistrationToken;
+export default TransactionToken;

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { body, validationResult } from "express-validator";
 
-import RegistrationToken from "../models/RegistrationToken.js";
+import RegistrationToken from "../models/TransactionToken.js";
 import Inquiry from "../models/Inquiry.js";
 
 import moduleHelper from "../util/moduleHelpers.js";

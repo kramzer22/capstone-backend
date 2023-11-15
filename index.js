@@ -4,7 +4,8 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-import registrationRouter from "./routes/registrationRouter.js";
+import transactionTokenRoute from "./routes/transactionRoute.js";
+import userRouter from "./routes/userRoute.js";
 import clientRouter from "./routes/clientRouter.js";
 import inquiryRouter from "./routes/inquiryRouter.js";
 import adminRouter from "./routes/adminRouter.js";
@@ -32,7 +33,8 @@ mongoose.connect(mongoDBPath);
 
 const PORT = 3001;
 
-app.use("/api/token", registrationRouter);
+app.use("/api/token", transactionTokenRoute);
+app.use("/api/user", userRouter);
 app.use("/api/client", clientRouter);
 app.use("/api/host", hostRouter);
 app.use("/api/inquiry", inquiryRouter);

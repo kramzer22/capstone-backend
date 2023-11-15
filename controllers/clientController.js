@@ -1,42 +1,22 @@
 import Client from "../models/Client.js";
 
 import clientHelpers from "../helpers/clientHelpers.js";
+import moduleCheckers from "../util/moduleCheckers.js";
 
-import moduleHelpers from "../util/moduleHelpers.js";
-
-const createUserClient = async (request, response) => {
+const registerClient = async (request, response) => {
+  const registrationToken = request.tokenResult;
   try {
-    const tokenID = request.query.token_id;
+    const newClient = await clientHelpers.registerClient(registrationToken);
 
-    const tokenResult = await moduleHelpers.checkTokenValidity(
-      tokenID,
-      "client-registration"
-    );
-
-    const data = moduleHelpers.decryptData(tokenResult.token, tokenResult.iv);
-
-    const newClient = await clientHelpers.runCreateClientTransaction(
-      data,
-      tokenResult._id
-    );
-
-    console.log(
-      `New user registered\nemail:${newClient.email}\nname:${newClient.first_name} ${newClient.last_name}`
-    );
-
-    response.status(201).json({
-      message: "successfully registered client",
-      emai: newClient.email,
-    });
+    response
+      .status(201)
+      .json({ message: "client successfully registered", newClient });
   } catch (error) {
-    if (error.message === "invalidTokenError") {
-      console.log("missing or invalid token");
-      response.status(401).json({ message: "Unauthorized access." });
+    if (error instanceof moduleCheckers.CustomError) {
+      response.status(error.status).json({ message: error.message });
     } else {
-      console.log("Unable to process transaction", error);
-      response
-        .status(500)
-        .json({ message: "Failed to process client registration. Try again." });
+      console.log(error);
+      response.status(500).json("Internal server problem");
     }
   }
 };
@@ -69,5 +49,5 @@ function getAllClient(request, response) {
 
 export default {
   getAllClient,
-  createUserClient,
+  registerClient,
 };
