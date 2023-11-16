@@ -6,7 +6,7 @@ import TransactionToken from "../models/TransactionToken.js";
 import moduleCheckers from "../util/moduleCheckers.js";
 import moduleHelpers from "../util/moduleHelpers.js";
 
-const TOKEN_TYPES = ["host-invite", "client-registration"];
+const TOKEN_TYPES = ["host-invite", "client-registration", "user-login"];
 
 const createHostInviteToken = async (apiKey, data, tokenType) => {
   try {
@@ -56,7 +56,7 @@ const createHostInviteToken = async (apiKey, data, tokenType) => {
   }
 };
 
-const createToken = async (data, n, d, tokenType) => {
+const createClientRegistrationToken = async (data, n, d, tokenType) => {
   try {
     const email = data.email;
     if (moduleCheckers.isValidEmail(email)) {
@@ -77,6 +77,27 @@ const createToken = async (data, n, d, tokenType) => {
     } else {
       throw new moduleCheckers.CustomError("email is invalid/missing", 400);
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const createGenericToken = async (data, n, d, tokenType) => {
+  try {
+    const entryDate = await moduleHelpers.getToday(n, d);
+    const encryptToken = moduleHelpers.encryptData(data);
+
+    const transactionToken = new TransactionToken({
+      token: encryptToken.token,
+      iv: encryptToken.iv,
+      transaction_type: tokenType,
+      entry_date: entryDate.entry_date,
+      expiry_date: entryDate.expiry_date,
+    });
+
+    await transactionToken.save();
+
+    return transactionToken.token;
   } catch (error) {
     throw error;
   }
@@ -115,6 +136,7 @@ const isTokenValid = async (token, tokenType) => {
 export default {
   TOKEN_TYPES,
   createHostInviteToken,
-  createToken,
+  createClientRegistrationToken,
+  createGenericToken,
   isTokenValid,
 };

@@ -84,6 +84,14 @@ const hashData = async (data) => {
   }
 };
 
+const compareHashData = async (plainData, hashedData) => {
+  try {
+    return await bcrypt.compare(plainData, hashedData);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const checkTokenValidity = async (tokenID, transactionType) => {
   try {
     const tokenResult = await RegistrationToken.findOne({
@@ -169,6 +177,7 @@ export default {
   encryptData,
   decryptData,
   hashData,
+  compareHashData,
   checkTokenValidity,
   sendMailToUser,
   monthAbbreviations,

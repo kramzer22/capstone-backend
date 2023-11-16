@@ -7,7 +7,7 @@ import moduleHelper from "../util/moduleHelpers.js";
 
 const registrationTypes = transactionTokenHelper.TOKEN_TYPES;
 
-const registerTransactionToken = async (request, response, next) => {
+const registerTransactionToken = async (request, response) => {
   const regType = request.params.type;
   if (
     regType &&
@@ -28,10 +28,23 @@ const registerTransactionToken = async (request, response, next) => {
       } else if (regType === "client-registration") {
         await moduleCheckers.checkUserEmailForDuplicate(request, response);
 
-        const token = await transactionTokenHelper.createToken(
+        const token =
+          await transactionTokenHelper.createClientRegistrationToken(
+            request.body,
+            15,
+            "minute",
+            regType
+          );
+
+        response.status(201).json({
+          message: `registration token successfully created`,
+          token: token,
+        });
+      } else if (regType === "user-login") {
+        const token = await transactionTokenHelper.createGenericToken(
           request.body,
-          15,
-          "minute",
+          30,
+          "day",
           regType
         );
 
@@ -59,7 +72,6 @@ const registerTransactionToken = async (request, response, next) => {
 };
 
 const checkTransactionToken = async (request, response, tokenType, next) => {
-  console.log(tokenType);
   if (tokenType && registrationTypes.find((item) => item === tokenType)) {
     try {
       const token = request.query.token_id;
