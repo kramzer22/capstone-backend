@@ -19,6 +19,7 @@ transactionTokenRoute.get(
   }
 );
 
+
 transactionTokenRoute.post(
   "/contact-inquiry",
   inquiryHelpers.validationRulesForInquiryData,
