@@ -60,6 +60,23 @@ hostRouter.post(
 );
 
 hostRouter.patch(
+  "/venue",
+  (request, response, next) => {
+    const tokenType = "user-login";
+    transactionTokenController.checkTransactionToken(
+      request,
+      response,
+      tokenType,
+      next
+    );
+  },
+  (request, response, next) => {
+    userHelpers.isValidUser(request, response, next, "host");
+  },
+  hostController.updateVenue
+);
+
+hostRouter.patch(
   "/venue/images",
   (request, response, next) => {
     const tokenType = "user-login";

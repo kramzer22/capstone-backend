@@ -34,7 +34,15 @@ const venueSchema = new mongoose.Schema({
     },
   },
   packages: {
-    type: String,
+    package: {
+      id: String,
+      name: String,
+      description: String,
+      price: Number,
+      inclusions: {
+        description: String,
+      },
+    },
   },
 });
 

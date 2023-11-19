@@ -67,6 +67,35 @@ const registerVenue = async (request, response) => {
   }
 };
 
+const updateVenue = async (request, response) => {
+  const bodyData = request.body;
+  try {
+    const venueId = new mongoose.Types.ObjectId(bodyData.venue_id);
+    const user = request.userData;
+
+    const updateVenue = await Venue.findByIdAndUpdate(
+      { _id: venueId },
+      {
+        $set: {
+          email: user.email,
+          venue_name: bodyData.venue_name,
+          "address.province": bodyData.address.province.name,
+          "address.city": bodyData.address.city.name,
+          "address.barangay": bodyData.address.barangay.name,
+          "address.street": bodyData.address.street,
+          description: bodyData.description,
+        },
+      },
+      { new: true }
+    );
+
+    response.status(200).json(updateVenue);
+  } catch (error) {
+    console.log(error);
+    response.status(500).json("internal server problem");
+  }
+};
+
 const uploadVenueImage = async (request, response) => {
   const uploadedFile = request.file;
   try {
@@ -122,6 +151,7 @@ const uploadVenueImage = async (request, response) => {
 
 export default {
   registerHost,
+  updateVenue,
   getVenue,
   registerVenue,
   uploadVenueImage,
