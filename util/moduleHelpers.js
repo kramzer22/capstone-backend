@@ -23,6 +23,17 @@ const monthAbbreviations = {
   Dec: 11,
 };
 
+const generateUniqueID = async () => {
+  try {
+    const dateString = await getToday().toString(36).entry_date;
+    const randomness = Math.random().toString(36).substr(2);
+    const buffer = Buffer.from(dateString + randomness, "utf-8");
+    return buffer.toString("hex");
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getToday = async (n, d) => {
   try {
     const response = await fetch(
@@ -173,6 +184,7 @@ const sendEmailVerification = async (data) => {
 };
 
 export default {
+  generateUniqueID,
   getToday,
   encryptData,
   decryptData,
