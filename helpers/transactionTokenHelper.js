@@ -106,7 +106,7 @@ const createGenericToken = async (data, n, d, tokenType) => {
 const isTokenValid = async (token, tokenType) => {
   try {
     if (token) {
-      const currentDate = (await moduleHelpers.getToday(1, "hour")).entry_date;
+      const currentDate = (await moduleHelpers.getToday(1, "hours")).entry_date;
       try {
         const tokenResult = await TransactionToken.findOne({
           token: token,

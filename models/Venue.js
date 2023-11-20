@@ -15,12 +15,13 @@ const venueSchema = new mongoose.Schema({
     trim: true,
   },
   address: {
-    type: Object,
+    type: {
+      province: String,
+      city: String,
+      barangay: String,
+      street: String,
+    },
     required: true,
-    province: String,
-    city: String,
-    barangay: String,
-    street: String,
   },
   description: {
     type: String,
@@ -28,21 +29,15 @@ const venueSchema = new mongoose.Schema({
     minlength: 1,
   },
   images: {
-    image: {
-      link: String,
-      name: String,
-    },
+    link: String,
+    name: String,
   },
   packages: {
-    package: {
-      id: String,
-      name: String,
-      description: String,
-      price: Number,
-      inclusions: {
-        description: String,
-      },
-    },
+    id: String,
+    name: String,
+    description: String,
+    price: Number,
+    inclusions: [String],
   },
 });
 

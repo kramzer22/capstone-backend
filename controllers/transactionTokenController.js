@@ -32,7 +32,7 @@ const registerTransactionToken = async (request, response) => {
           await transactionTokenHelper.createClientRegistrationToken(
             request.body,
             15,
-            "minute",
+            "minutes",
             regType
           );
 
@@ -44,7 +44,7 @@ const registerTransactionToken = async (request, response) => {
         const token = await transactionTokenHelper.createGenericToken(
           request.body,
           30,
-          "day",
+          "days",
           regType
         );
 

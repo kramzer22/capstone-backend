@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 
 import User from "../models/User.js";
 import Host from "../models/Host.js";
+import Venue from "../models/Venue.js";
 import TransactionToken from "../models/TransactionToken.js";
 
+import moduleCheckers from "../util/moduleCheckers.js";
 import moduleHelpers from "../util/moduleHelpers.js";
 
 const registerHost = async (registrationToken, data) => {
@@ -81,4 +83,38 @@ const registerHost = async (registrationToken, data) => {
   }
 };
 
-export default { registerHost };
+const checkVenueAndEmailValidity = async (request, response, next) => {
+  const venueId = new mongoose.Types.ObjectId(request.params.id);
+
+  try {
+    const venue = await Venue.findById({ _id: venueId });
+
+    if (!venue) {
+      throw new moduleCheckers.CustomError(
+        "id is invalid or malformed",
+        401,
+        "invalidIdError"
+      );
+    }
+
+    if (venue.email !== request.userData.email) {
+      throw new moduleCheckers.CustomError(
+        "request denied invalid host token",
+        401,
+        "invalidIdError"
+      );
+    }
+
+    request.venueData = venue;
+    next();
+  } catch (error) {
+    console.log(error);
+    if (error instanceof moduleCheckers.CustomError) {
+      response.status(error.status).json({ message: error.message });
+    } else {
+      response.status(500).json("internal server problem");
+    }
+  }
+};
+
+export default { registerHost, checkVenueAndEmailValidity };

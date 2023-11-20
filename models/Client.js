@@ -9,18 +9,20 @@ const clientSchema = new mongoose.Schema({
     maxlength: 100,
   },
   name: {
-    first_name: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 100,
+    type: {
+      first_name: {
+        type: String,
+        minlength: 1,
+        maxlength: 100,
+      },
+      last_name: {
+        type: String,
+        minlength: 1,
+        maxlength: 100,
+      },
     },
-    last_name: {
-      type: String,
-      required: true,
-      minlength: 1,
-      maxlength: 100,
-    },
+    required: true,
+    _id: false,
   },
   number: {
     type: String,

@@ -10,7 +10,6 @@ const hostSchema = new mongoose.Schema({
   },
   name: {
     type: Object,
-    required: true,
     first_name: {
       type: String,
       required: true,
@@ -25,6 +24,8 @@ const hostSchema = new mongoose.Schema({
       maxlength: 100,
       trim: true,
     },
+    required: true,
+    _id: false,
   },
   dob: {
     type: Date,
@@ -40,24 +41,28 @@ const hostSchema = new mongoose.Schema({
     required: true,
   },
   address: {
-    type: Object,
+    type: {
+      province: String,
+      city: String,
+      barangay: String,
+      street: String,
+    },
     required: true,
-    province: String,
-    city: String,
-    barangay: String,
-    street: String,
+    _id: false,
   },
   number: {
-    type: Object,
+    type: {
+      mobile: {
+        type: String,
+        minlength: 11,
+        maxlength: 11,
+      },
+      landline: {
+        type: String,
+      },
+    },
     required: true,
-    mobile: {
-      type: String,
-      minlength: 11,
-      maxlength: 11,
-    },
-    landline: {
-      type: String,
-    },
+    _id: false,
   },
   document_verified: {
     type: Boolean,

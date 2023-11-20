@@ -151,7 +151,8 @@ const sendEmailVerification = async (data) => {
 
   console.log(data);
   try {
-    const dates = getToday(30, "day");
+    const dates = await getToday(30, "days");
+    console.log(dates);
     const encryptResult = encryptData(data);
     const registrationToken = new RegistrationToken({
       token: encryptResult.token,

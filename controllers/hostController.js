@@ -70,11 +70,11 @@ const registerVenue = async (request, response) => {
 const updateVenue = async (request, response) => {
   const bodyData = request.body;
   try {
-    const venueId = new mongoose.Types.ObjectId(bodyData.venue_id);
     const user = request.userData;
+    const venue = request.venueData;
 
     const updateVenue = await Venue.findByIdAndUpdate(
-      { _id: venueId },
+      { _id: venue.id },
       {
         $set: {
           email: user.email,
@@ -99,17 +99,6 @@ const updateVenue = async (request, response) => {
 const uploadVenueImage = async (request, response) => {
   const uploadedFile = request.file;
   try {
-    const venueId = new mongoose.Types.ObjectId(request.body.venue_id);
-    const venue = await Venue.findById({
-      _id: venueId,
-    });
-    if (!venue) {
-      throw new moduleCheckers.CustomError(
-        "id is invalid or malformed",
-        401,
-        "invalidIdError"
-      );
-    }
     const fileName = await moduleHelpers.generateUniqueID();
     const storageRef = ref(storage, fileName);
     const metadata = {
@@ -124,7 +113,7 @@ const uploadVenueImage = async (request, response) => {
     const imageLocation = `https://firebasestorage.googleapis.com/v0/b/easygigph-7d555.appspot.com/o/${snapshot.metadata.fullPath}?alt=media`;
 
     const updateVenue = await Venue.findByIdAndUpdate(
-      { _id: venueId },
+      { _id: request.venueData.id },
       {
         $push: {
           images: {
@@ -141,11 +130,38 @@ const uploadVenueImage = async (request, response) => {
     response.status(200).json({ venue_id: updateVenue });
   } catch (error) {
     console.log(error);
-    if (error instanceof moduleCheckers.CustomError) {
-      response.status(error.status).json({ message: error.message });
-    } else {
-      response.status(500).json("internal server problem");
-    }
+    response.status(500).json("internal server problem");
+  }
+};
+
+const addVenuePackage = async (request, response) => {
+  try {
+    const fileName = await moduleHelpers.generateUniqueID();
+    const data = request.body;
+    console.log(data);
+    console.log(request.venueData);
+    const updateVenue = await Venue.findByIdAndUpdate(
+      { _id: request.venueData.id },
+      {
+        $push: {
+          packages: {
+            package: {
+              id: fileName,
+              name: data.name,
+              description: data.description,
+              price: parseFloat(data.price),
+              inclusions: data.inclusions,
+            },
+          },
+        },
+      },
+      { new: true }
+    );
+
+    response.status(201).json({ updateVenue });
+  } catch (error) {
+    console.log(error);
+    response.status(500).json("internal server problem");
   }
 };
 
@@ -155,4 +171,5 @@ export default {
   getVenue,
   registerVenue,
   uploadVenueImage,
+  addVenuePackage,
 };
