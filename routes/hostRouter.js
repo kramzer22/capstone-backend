@@ -26,6 +26,24 @@ hostRouter.get(
   (request, response, next) => {
     userHelpers.isValidUser(request, response, next, "host");
   },
+  hostController.getVenues
+);
+
+hostRouter.get(
+  "/venue/:id",
+  (request, response, next) => {
+    const tokenType = "user-login";
+    transactionTokenController.checkTransactionToken(
+      request,
+      response,
+      tokenType,
+      next
+    );
+  },
+  (request, response, next) => {
+    userHelpers.isValidUser(request, response, next, "host");
+  },
+  hostHelpers.checkVenueAndEmailValidity,
   hostController.getVenue
 );
 
@@ -80,6 +98,24 @@ hostRouter.post(
 );
 
 hostRouter.patch(
+  "/venue/:id/package/:package_id",
+  (request, response, next) => {
+    const tokenType = "user-login";
+    transactionTokenController.checkTransactionToken(
+      request,
+      response,
+      tokenType,
+      next
+    );
+  },
+  (request, response, next) => {
+    userHelpers.isValidUser(request, response, next, "host");
+  },
+  hostHelpers.checkVenueAndEmailValidity,
+  hostController.updateVenuePackage
+);
+
+hostRouter.patch(
   "/venue/:id",
   (request, response, next) => {
     const tokenType = "user-login";
@@ -114,6 +150,42 @@ hostRouter.patch(
   hostHelpers.checkVenueAndEmailValidity,
   upload.single("image"),
   hostController.uploadVenueImage
+);
+
+hostRouter.delete(
+  "/venue/:id/images/:image_id",
+  (request, response, next) => {
+    const tokenType = "user-login";
+    transactionTokenController.checkTransactionToken(
+      request,
+      response,
+      tokenType,
+      next
+    );
+  },
+  (request, response, next) => {
+    userHelpers.isValidUser(request, response, next, "host");
+  },
+  hostHelpers.checkVenueAndEmailValidity,
+  hostController.removeVenueImage
+);
+
+hostRouter.delete(
+  "/venue/:id/package/:package_id",
+  (request, response, next) => {
+    const tokenType = "user-login";
+    transactionTokenController.checkTransactionToken(
+      request,
+      response,
+      tokenType,
+      next
+    );
+  },
+  (request, response, next) => {
+    userHelpers.isValidUser(request, response, next, "host");
+  },
+  hostHelpers.checkVenueAndEmailValidity,
+  hostController.removeVenuePackage
 );
 
 export default hostRouter;

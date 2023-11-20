@@ -22,23 +22,30 @@ const venueSchema = new mongoose.Schema({
       street: String,
     },
     required: true,
+    _id: false,
   },
   description: {
     type: String,
     required: true,
     minlength: 1,
   },
-  images: {
-    link: String,
-    name: String,
-  },
-  packages: {
-    id: String,
-    name: String,
-    description: String,
-    price: Number,
-    inclusions: [String],
-  },
+  images: [
+    {
+      _id: false,
+      link: String,
+      name: String,
+    },
+  ],
+  packages: [
+    {
+      _id: false,
+      id: String,
+      name: String,
+      description: String,
+      price: Number,
+      inclusions: [String],
+    },
+  ],
 });
 
 venueSchema.set("toJSON", {
