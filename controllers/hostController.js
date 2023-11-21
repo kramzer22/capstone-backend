@@ -201,6 +201,7 @@ const updateVenuePackage = async (request, response) => {
       { _id: request.venueData.id, "packages.id": packageId },
       {
         $set: {
+          "packages.$.id": packageId,
           "packages.$.name": data.name,
           "packages.$.description": data.description,
           "packages.$.price": data.price,

@@ -93,7 +93,13 @@ const checkUserToken = async (request, response) => {
         "invalidCredentials"
       );
     }
-    response.status(200).json({ message: "valid user token" });
+    response
+      .status(200)
+      .json({
+        message: "valid user token",
+        user_role: user.role,
+        email: user.email,
+      });
   } catch (error) {
     if (error instanceof moduleCheckers.CustomError) {
       response

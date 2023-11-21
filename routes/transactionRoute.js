@@ -1,7 +1,6 @@
 import express from "express";
 
 import transactionTokenController from "../controllers/transactionTokenController.js";
-import clientHelpers from "../helpers/clientHelpers.js";
 import inquiryHelpers from "../helpers/inquiryHelpers.js";
 
 const transactionTokenRoute = express.Router();
@@ -18,7 +17,6 @@ transactionTokenRoute.get(
     response.status(200).json({ message: "token is valid" });
   }
 );
-
 
 transactionTokenRoute.post(
   "/contact-inquiry",
