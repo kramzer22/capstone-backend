@@ -54,6 +54,24 @@ const getToday = async (n, d) => {
   }
 };
 
+function getDateDifference(startDate, endDate) {
+  const diffMilliseconds = endDate - startDate;
+  const diffSeconds = Math.floor(diffMilliseconds / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays > 0) {
+    return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+  } else if (diffHours > 0) {
+    return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
+  } else if (diffMinutes > 0) {
+    return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
+  } else {
+    return "Just now";
+  }
+}
+
 const encryptData = (data) => {
   const secretKey = process.env.ENV_SECRET_KEY;
   const iv = crypto.randomBytes(16);
@@ -191,6 +209,7 @@ export default {
   decryptData,
   hashData,
   compareHashData,
+  getDateDifference,
   checkTokenValidity,
   sendMailToUser,
   monthAbbreviations,

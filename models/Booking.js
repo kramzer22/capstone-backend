@@ -1,18 +1,42 @@
 import mongoose from "mongoose";
 
-const venueSchema = new mongoose.Schema({
-  email: {
+const bookingSchema = new mongoose.Schema({
+  client_email: {
     type: String,
     required: true,
     minlength: 5,
     maxlength: 100,
   },
+  host_email: {
+    type: String,
+    required: true,
+    minlength: 5,
+    maxlength: 100,
+  },
+  booking_status: {
+    type: String,
+    required: true,
+    default: "approval_pending",
+  },
+  entry_date: {
+    type: Date,
+    required: true,
+  },
+  book_date: {
+    type: Date,
+    required: true,
+  },
+  venue_id: {
+    type: String,
+    required: true,
+  },
   venue_name: {
     type: String,
     required: true,
-    minlength: 1,
-    maxlength: 100,
-    trim: true,
+  },
+  description: {
+    type: String,
+    required: true,
   },
   address: {
     type: {
@@ -24,11 +48,6 @@ const venueSchema = new mongoose.Schema({
     required: true,
     _id: false,
   },
-  description: {
-    type: String,
-    required: true,
-    minlength: 1,
-  },
   images: [
     {
       _id: false,
@@ -36,19 +55,20 @@ const venueSchema = new mongoose.Schema({
       name: String,
     },
   ],
-  packages: [
-    {
-      _id: false,
+  package: {
+    type: {
       id: String,
       name: String,
       description: String,
       price: Number,
       inclusions: [String],
     },
-  ],
+    _id: false,
+    required: true,
+  },
 });
 
-venueSchema.set("toJSON", {
+bookingSchema.set("toJSON", {
   transform: (_document, returnedObject) => {
     returnedObject.id = returnedObject._id;
     returnedObject.complete_address = `${returnedObject.address.street} ${returnedObject.address.barangay}, ${returnedObject.address.city}, ${returnedObject.address.province}`;
@@ -57,6 +77,6 @@ venueSchema.set("toJSON", {
   },
 });
 
-const Venue = mongoose.model("venue", venueSchema);
+const Booking = mongoose.model("booking", bookingSchema);
 
-export default Venue;
+export default Booking;
