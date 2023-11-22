@@ -29,7 +29,7 @@ notificationRouter.get(
       const todayDate = (await moduleHelpers.getToday(3, "hours")).entry_date;
       const notifications = await Notification.find({
         email: request.userData.email,
-      });
+      }).sort({ entry_date: -1 });
 
       const responseNotification = notifications.map((notification) => {
         const elapseDate = moduleHelpers.getDateDifference(

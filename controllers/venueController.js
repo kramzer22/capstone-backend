@@ -8,7 +8,8 @@ import moduleHelpers from "../util/moduleHelpers.js";
 const createVenueBooking = async (request, response) => {
   const bookingData = request.bookingData;
 
-  console.log(bookingData);
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     const dates = await moduleHelpers.getToday(3, "hours");
@@ -54,12 +55,12 @@ const createVenueBooking = async (request, response) => {
       package: bookingData.package,
     });
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     await notificationHost.save();
     await notificationClient.save();
     await booking.save();
+
+    await session.commitTransaction();
+    session.endSession();
 
     response.status(201).json(booking);
   } catch (error) {
