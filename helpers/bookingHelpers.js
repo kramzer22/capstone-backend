@@ -5,14 +5,10 @@ import Booking from "../models/Booking.js";
 import moduleCheckers from "../util/moduleCheckers.js";
 
 const checkBookingValidity = async (request, response, next) => {
-  const data = request.body;
   const bookingId = new mongoose.Types.ObjectId(request.params.book_id);
 
   try {
-    const booking = await Booking.findById({
-      _id: bookingId,
-      host_email: request.userData.email,
-    });
+    const booking = await Booking.findById({ _id: bookingId });
 
     if (!booking) {
       throw new moduleCheckers.CustomError(
@@ -22,7 +18,6 @@ const checkBookingValidity = async (request, response, next) => {
       );
     }
 
-    console.log(booking);
     request.bookingData = booking;
     next();
   } catch (error) {
