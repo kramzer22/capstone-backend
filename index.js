@@ -13,6 +13,7 @@ import hostRouter from "./routes/hostRouter.js";
 import venueRoute from "./routes/venueRoute.js";
 import notificationRouter from "./routes/notificationRouter.js";
 import bookingRouter from "./routes/bookingRouter.js";
+import messagingRouter from "./routes/messagingRouter.js";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/venues", venueRoute);
 app.use("/api/notification", notificationRouter);
 app.use("/api/booking", bookingRouter);
+app.use("/api/messaging", messagingRouter);
 
 app.listen(PORT, () => {
   console.log("Server is now running on port: " + PORT);
