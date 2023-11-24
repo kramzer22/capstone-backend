@@ -2,6 +2,7 @@ import express from "express";
 
 import Message from "../models/Message.js";
 import Host from "../models/Host.js";
+import Client from "../models/Client.js";
 
 import transactionTokenController from "../controllers/transactionTokenController.js";
 
@@ -32,16 +33,22 @@ messagingRouter.get(
     try {
       const emailToSearch =
         senderRole === "client" ? "users.client_email" : "users.host_email";
+
       const messageData = await Message.find({
         [emailToSearch]: senderEmail,
       }).sort({ update_date: -1 });
+
+      const datesResult = await moduleHelpers.getToday(1, "hours");
 
       const modifiedMessageData = await Promise.all(
         messageData.map(async (data) => {
           const host = await Host.findOne({
             email: data.users.host_email,
           });
-          const datesResult = await moduleHelpers.getToday(1, "hours");
+
+          const client = await Client.findOne({
+            email: data.users.client_email,
+          });
 
           return {
             ...data.toJSON(),
@@ -57,6 +64,9 @@ messagingRouter.get(
                   ? "sender"
                   : "recipient",
             },
+            client_name: client
+              ? `${client.name.first_name} ${client.name.last_name}`
+              : null,
             host_name: host ? host.business_name : null,
           };
         })
@@ -98,6 +108,10 @@ messagingRouter.post(
         email: senderRole === "client" ? recipient : senderEmail,
       });
 
+      const clientData = await Client.findOne({
+        email: senderRole === "client" ? senderEmail : recipient,
+      });
+
       const modifiedMessageData = !messageData
         ? null
         : {
@@ -129,6 +143,9 @@ messagingRouter.post(
 
       const responseData = {
         ...modifiedMessageData,
+        client_name: clientData
+          ? `${clientData.name.first_name} ${clientData.name.last_name}`
+          : null,
         host_name: hostData.business_name,
       };
 
