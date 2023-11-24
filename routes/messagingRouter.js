@@ -112,27 +112,25 @@ messagingRouter.post(
         email: senderRole === "client" ? senderEmail : recipient,
       });
 
+      const datesResult = await moduleHelpers.getToday(1, "hours");
+
       const modifiedMessageData = !messageData
         ? null
         : {
             ...messageData.toJSON(),
-            messages: await Promise.all(
-              messageData.messages.map(async (message) => {
-                const datesResult = await moduleHelpers.getToday(1, "hours");
-
-                return {
-                  user_email: message.user_email,
-                  content: message.content,
-                  date_entry: message.date_entry,
-                  elapsed: moduleHelpers.getDateDifference(
-                    message.date_entry,
-                    datesResult.entry_date
-                  ),
-                  who_is:
-                    senderEmail === message.user_email ? "sender" : "recipient",
-                };
-              })
-            ),
+            messages: messageData.messages.map(async (message) => {
+              return {
+                user_email: message.user_email,
+                content: message.content,
+                date_entry: message.date_entry,
+                elapsed: moduleHelpers.getDateDifference(
+                  message.date_entry,
+                  datesResult.entry_date
+                ),
+                who_is:
+                  senderEmail === message.user_email ? "sender" : "recipient",
+              };
+            }),
           };
 
       if (modifiedMessageData && modifiedMessageData.messages) {
