@@ -118,7 +118,7 @@ messagingRouter.post(
         ? null
         : {
             ...messageData.toJSON(),
-            messages: messageData.messages.map(async (message) => {
+            messages: messageData.messages.map((message) => {
               return {
                 user_email: message.user_email,
                 content: message.content,
