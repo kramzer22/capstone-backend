@@ -184,7 +184,7 @@ const sendEmailVerification = async (data) => {
 
     try {
       const subject = "Email verification from Easygigph";
-      const message = `We hope this message finds you well. Congratulations on successfully registering to Easygigph.\n\nPlease verify your email by clicking the link below \n\nhttp://localhost:5173/register/verify/?token_id=${encryptResult.token}`;
+      const message = `We hope this message finds you well. Congratulations on successfully registering to Easygigph.\n\nPlease verify your email by clicking the link below \n\nhttps://kramzer22.github.io/capstone-event-booking-app/#/register/verify/?token_id=${encryptResult.token}`;
       await sendMailToUser(data.email, subject, message);
 
       await session.commitTransaction();

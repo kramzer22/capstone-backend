@@ -35,7 +35,7 @@ const createHostInviteToken = async (apiKey, data, tokenType) => {
         await transactionToken.save();
 
         const subject = "Invitation request from Easygigph";
-        const message = `We hope this message finds you well. We are excited to extend an invitation to you to join our platform and become a valued member of our community.\nClick the link below to start\n\nhttp://localhost:5173/register/?user=host&token=${transactionToken.token}`;
+        const message = `We hope this message finds you well. We are excited to extend an invitation to you to join our platform and become a valued member of our community.\nClick the link below to start\n\nhttps://kramzer22.github.io/capstone-event-booking-app/#//register/?user=host&token=${transactionToken.token}`;
         await moduleHelpers.sendMailToUser(email, subject, message);
 
         await session.commitTransaction();
